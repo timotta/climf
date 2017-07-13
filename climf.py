@@ -70,9 +70,10 @@ def update(data,Uo,Vo,lbda,gamma):
         dU = -lbda*U[i]
         f = precompute_f(data,U,V,i)
         for j in f:
-            dV = g(-f[j])-lbda*V[j]
+            dV = g(-f[j])
             for k in f:
-                dV += dg(f[j]-f[k])*(1/(1-g(f[k]-f[j]))-1/(1-g(f[j]-f[k])))*U[i]
+                dV += dg(f[j]-f[k])*(1/(1-g(f[k]-f[j]))-1/(1-g(f[j]-f[k])))
+            dV = dV*U[i]-lbda*V[j]
             Vo[j] += gamma*dV
             dU += g(-f[j])*V[j]
             for k in f:
