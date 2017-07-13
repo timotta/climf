@@ -54,7 +54,7 @@ def objective(data,U,V,lbda):
                 F += log(1-g(f[k]-f[j]))
     return F
 
-def update(data,U,V,lbda,gamma):
+def update(data,Uo,Vo,lbda,gamma):
     """update user/item factors using stochastic gradient ascent
     params:
       data : scipy csr sparse matrix containing user->(item,count)
@@ -63,6 +63,9 @@ def update(data,U,V,lbda,gamma):
       lbda : regularization constant lambda
       gamma: learning rate
     """
+    U = Uo.copy()
+    V = Vo.copy()
+    
     for i in xrange(len(U)):
         dU = -lbda*U[i]
         f = precompute_f(data,U,V,i)
@@ -70,11 +73,11 @@ def update(data,U,V,lbda,gamma):
             dV = g(-f[j])-lbda*V[j]
             for k in f:
                 dV += dg(f[j]-f[k])*(1/(1-g(f[k]-f[j]))-1/(1-g(f[j]-f[k])))*U[i]
-            V[j] += gamma*dV
+            Vo[j] += gamma*dV
             dU += g(-f[j])*V[j]
             for k in f:
                 dU += (V[j]-V[k])*dg(f[k]-f[j])/(1-g(f[k]-f[j]))
-        U[i] += gamma*dU
+        Uo[i] += gamma*dU
 
 def compute_mrr(data,U,V,test_users=None):
     """compute average Mean Reciprocal Rank of data according to factors
